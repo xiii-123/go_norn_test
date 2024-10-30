@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/elliptic"
 	"encoding/hex"
+	"errors"
 	"github.com/chain-lab/go-norn/common"
 	"github.com/chain-lab/go-norn/core"
 	"github.com/chain-lab/go-norn/crypto"
@@ -249,7 +250,13 @@ func (pm *P2PManager) packageBlockRoutine() {
 			// 交易池打包返回一个交易数组
 			txs := pm.txPool.Package()
 			log.Infof("Package %d txs.", len(txs))
-			newBlock, err := pm.chain.PackageNewBlock(txs, timestamp, &params, packageBlockInterval)
+
+			// 直接将节点打包区块的代码注释掉，当作恶意节点
+			//newBlock, err := pm.chain.PackageNewBlock(txs, timestamp, &params, packageBlockInterval)
+			newBlock, err := func(txs []common.Transaction, timestamp int64, params *common.GeneralParams, packageInterval int64) (*common.Block, error) {
+				return nil, errors.New("====Malicious nodes, packaging is prohibited!====")
+			}(txs, timestamp, &params, packageBlockInterval)
+
 			log.Infof("Package new block.")
 
 			if err != nil {
